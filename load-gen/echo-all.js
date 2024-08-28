@@ -11,8 +11,8 @@ export const options = {
 };
 
 // TODO get these from environment
-const echoDefaultEndpoint = 'http://echo-server:8080'
-const echoJSONEndpoint = 'http://echo-server:8080/json'
+const echoDefaultEndpoint = 'http://0.0.0.0:5000/api/v0/echo'
+const echoJSONEndpoint = 'http://0.0.0.0:5000/api/v0/echo/json'
 
 const endpoints = [
     echoDefaultEndpoint,

@@ -1,9 +1,14 @@
 ---
 extensions:
-  basicauth/otlp:
+  basicauth/otlp-team-a:
     client_auth:
       username: team-a
-      password: team-a
+      password:
+  basicauth/otlp-team-b:
+    client_auth:
+      username: team-b
+      password:
+
 
 receivers:
   otlp:
@@ -22,13 +27,20 @@ exporters:
     endpoint: https://otlp-gateway-prod-us-central-0.grafana.net/otlp
     auth:
       authenticator: basicauth/otlp
-  otlphttp/mimir-microservices-mode-local:
+  otlphttp/mimir-microservices-mode-local-team-a:
     endpoint: http://127.0.0.1:8000/otlp
     # use for multi-tenant Mimir
-    #    headers:
-    #      "X-Scope-OrgId": "team-a"
-    #    auth:
-    #      authenticator: basicauth/otlp
+    headers:
+      "X-Scope-OrgId": "team-a"
+    auth:
+      authenticator: basicauth/otlp-team-a
+  otlphttp/mimir-microservices-mode-local-team-b:
+    endpoint: http://127.0.0.1:8000/otlp
+    # use for multi-tenant Mimir
+    headers:
+      "X-Scope-OrgId": "team-b"
+    auth:
+      authenticator: basicauth/otlp-team-b
   otlphttp/mimir-monolithic-mode-local:
     endpoint: http://127.0.0.1:8001/otlp
   otlphttp/mimir-monolithic-mode-docker-compose:
@@ -60,14 +72,16 @@ service:
       # tends to collide with other ports when running on host network
       # https://github.com/open-telemetry/opentelemetry-collector/discussions/6547
       level: none
-  extensions: [ basicauth/otlp ]
+  extensions: [ basicauth/otlp-team-a, basicauth/otlp-team-b ]
   pipelines:
     metrics:
       receivers: [ otlp ]
-      exporters: [ debug, otlphttp/mimir-monolithic-mode-docker-compose ]
-    traces:
-      receivers: [ otlp ]
-      exporters: [ debug ]
-    logs:
-      receivers: [ otlp ]
-      exporters: [ debug ]
+      exporters:
+        - otlphttp/mimir-microservices-mode-local-team-a
+        - otlphttp/mimir-microservices-mode-local-team-b
+#    traces:
+#      receivers: [ otlp ]
+#      exporters: [ debug ]
+#    logs:
+#      receivers: [ otlp ]
+#      exporters: [ debug ]

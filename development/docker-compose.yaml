@@ -23,9 +23,9 @@ services:
     container_name: otel-collector
     command:
       - "--config=/etc/otel-collector-config.yaml"
-    #    network_mode: host
-    networks:
-      echo-server:
+    network_mode: host
+    #    networks:
+    #      echo-server:
     ports:
       - "4317:4317"
     volumes:
@@ -52,8 +52,9 @@ services:
     command:
       - "run"
       - "/scripts/echo-all.js"
-    networks:
-      echo-server:
+    network_mode: host
+    #    networks:
+    #      echo-server:
     volumes:
       - ../load-gen:/scripts
 
